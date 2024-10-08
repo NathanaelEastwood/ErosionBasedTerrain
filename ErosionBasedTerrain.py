@@ -1,10 +1,12 @@
 import random
 from math import sqrt
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import mpl_toolkits.mplot3d.axes3d as axes3d
 from typing import List
+mpl.use("Qt5Agg")
 
 
 class TerrainPoint:
@@ -44,12 +46,14 @@ class ErosionBasedTerrain:
                 idx = (x_values == x) & (y_values == y)
                 z_grid[j, i] = z_values[idx][0]  # Assuming there's one z for each (x, y)
 
+        plt.figure(dpi=1200)
         # Set up the 3D plot
         fig, ax = plt.subplots(subplot_kw=dict(projection='3d'))
 
         # Plot the surface
         ax.plot_surface(x_grid, y_grid, z_grid, cmap=plt.get_cmap('jet'))
-
+        ax.view_init(azim=45, elev=30)
+        plt.savefig('filename.pdf')
         plt.show()
 
     def generateBaseLandscape(self) -> List[TerrainPoint]:
@@ -82,7 +86,7 @@ class ErosionBasedTerrain:
     def getPointBetweenPoints(self, point_a: TerrainPoint, point_b: TerrainPoint, result_point: TerrainPoint) -> TerrainPoint:
         distance_from_a = self.getDistanceBetweenPoints(point_a, result_point)
         distance_from_b = self.getDistanceBetweenPoints(point_b, result_point)
-        bias = distance_from_a / distance_from_b
+        bias = distance_from_a / distance_from_b if distance_from_a / distance_from_b is not None else 0
         result_point.z = (distance_from_a + distance_from_b) * bias
 
         return result_point
